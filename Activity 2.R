@@ -58,3 +58,62 @@ hist(datW$TAVE[datW$siteN == 1],
      col="grey75",
      border="white")
 help(hist)
+
+# Making a histogram for the Livermore site in our levels
+hist(datW$TAVE[datW$siteN == 1],
+     freq=FALSE, 
+     main = paste(levels(datW$NAME)[2]),
+     xlab = "Average daily temperature (degrees C)", 
+     ylab="Relative frequency",
+     col="grey75",
+     border="white")
+
+# Learning abour different functions
+help(hist)
+help(dnorm)
+
+# Testing out pnorm
+# (Value (note this will evaluate for all values and below),mean, standard deviation)
+pnorm(0,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
+# Finding probability of values between 0 and 5
+pnorm(5,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE)) - pnorm(0,
+                                                         mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+                                                         sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
+# pnrom of 20 gives me all probability (area of the curve) below 20 
+# Subtracting from 1 leaves us with the area above 20
+1 - pnorm(20,
+          mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+          sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
+# qnorm gives value at which all values and below equal the probability in my argument
+# Calculating the value of the 95th quantile or a probability of 0.95
+qnorm(0.95,
+      mean(datW$TAVE[datW$siteN == 1],na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
+# Calculating current threshold for extreme heat events in Arberdeen with 4 degrees
+#   of warming to the mean
+qnorm(0.9,
+      mean(datW$TAVE[datW$siteN == 1] + 4,na.rm=TRUE),
+      sd(datW$TAVE[datW$siteN == 1],na.rm=TRUE))
+
+# Creating a precipitation histogram for Arberdeen
+hist(datW$PRCP[datW$siteN == 1],
+     freq=FALSE, 
+     main = paste(levels(datW$NAME)[1]),
+     xlab = "Average precipitation (mm)", 
+     ylab="Relative frequency",
+     col="grey75",
+     border="white")
+
+# Unsure about this one
+averagePrcp <- aggregate(datW$PRCP, by=list(datW$NAME), FUN="mean",na.rm=TRUE)
+colnames(averagePrcp) <- c("NAME", "PRCP")
+averagePrcp
+
