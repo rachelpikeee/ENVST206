@@ -112,8 +112,24 @@ hist(datW$PRCP[datW$siteN == 1],
      col="grey75",
      border="white")
 
-# Unsure about this one
-averagePrcp <- aggregate(datW$PRCP, by=list(datW$NAME), FUN="mean",na.rm=TRUE)
-colnames(averagePrcp) <- c("NAME", "PRCP")
-averagePrcp
+# Getting total annual prcp by site and year
+totalPrcp <- aggregate(datW$PRCP, by=list(datW$NAME, datW$year), FUN="sum",na.rm=TRUE)
+colnames(totalPrcp) <- c("NAME", "YEAR", "PRCP")
+totalPrcp
+
+levels(totalPrcp$NAME)
+
+# Creating a total annual precipitation histogram for Arberdeen
+# Get an error here involving the breaks?
+hist(totalPrcp$PRCP[totalPrcp$siteN == 1],
+     breaks = 15,
+     freq=FALSE, 
+     main = paste(levels(datW$totalPrcp)[1]),
+     xlab = "Average precipitation (mm)", 
+     ylab="Relative frequency",
+     col="grey75",
+     border="white")
+
+
+
 
