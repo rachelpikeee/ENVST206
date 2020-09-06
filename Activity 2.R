@@ -60,7 +60,7 @@ hist(datW$TAVE[datW$siteN == 1],
 help(hist)
 
 # Making a histogram for the Livermore site in our levels
-hist(datW$TAVE[datW$siteN == 1],
+hist(datW$TAVE[datW$siteN == 2],
      freq=FALSE, 
      main = paste(levels(datW$NAME)[2]),
      xlab = "Average daily temperature (degrees C)", 
@@ -117,18 +117,21 @@ totalPrcp <- aggregate(datW$PRCP, by=list(datW$NAME, datW$year), FUN="sum",na.rm
 colnames(totalPrcp) <- c("NAME", "YEAR", "PRCP")
 totalPrcp
 
+# Getting unique values for each site in total precip names
 levels(totalPrcp$NAME)
 
 # Creating a total annual precipitation histogram for Arberdeen
 # Get an error here involving the breaks?
-hist(totalPrcp$PRCP[totalPrcp$siteN == 1],
-     breaks = 15,
+hist(totalPrcp$PRCP[totalPrcp$NAME == 1],
      freq=FALSE, 
-     main = paste(levels(datW$totalPrcp)[1]),
+     main = paste(levels(totalPrcp$NAME)[1]),
      xlab = "Average precipitation (mm)", 
      ylab="Relative frequency",
      col="grey75",
      border="white")
+
+# Testing out new histogram functions
+hist(totalPrcp$PRCP, freq = FALSE)
 
 
 
