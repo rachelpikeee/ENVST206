@@ -121,8 +121,8 @@ totalPrcp
 levels(totalPrcp$NAME)
 
 # Creating a total annual precipitation histogram for Arberdeen
-# Get an error here involving the breaks?
-hist(totalPrcp$PRCP[totalPrcp$NAME == 1],
+# This worked when I had the name in quotes but not indexing like "totalPrcp$NAME == 1"?
+hist(totalPrcp$PRCP[totalPrcp$NAME == "ABERDEEN, WA US"],
      freq=FALSE, 
      main = paste(levels(totalPrcp$NAME)[1]),
      xlab = "Average precipitation (mm)", 
@@ -130,9 +130,21 @@ hist(totalPrcp$PRCP[totalPrcp$NAME == 1],
      col="grey75",
      border="white")
 
-# Testing out new histogram functions
-hist(totalPrcp$PRCP, freq = FALSE)
+# Creating a total annual precipitation histogram for Mandan
+hist(totalPrcp$PRCP[totalPrcp$NAME == "MANDAN EXPERIMENT STATION, ND US"],
+     freq=FALSE, 
+     main = paste(levels(totalPrcp$NAME)[3]),
+     xlab = "Average precipitation (mm)", 
+     ylab="Relative frequency",
+     col="grey75",
+     border="white")
 
+# Finding likelihood of 700mm of precipitation at Arberdeen
+pnorm(700,
+      mean(totalPrcp$PRCP[totalPrcp$NAME == "ABERDEEN, WA US"],na.rm=TRUE),
+      sd(totalPrcp$PRCP[totalPrcp$NAME == "ABERDEEN, WA US"],na.rm=TRUE))
 
-
-
+# Finding likelihood of 700mm of precipitation at Mandan
+pnorm(700,
+      mean(totalPrcp$PRCP[totalPrcp$NAME == "MANDAN EXPERIMENT STATION, ND US"],na.rm=TRUE),
+      sd(totalPrcp$PRCP[totalPrcp$NAME == "MANDAN EXPERIMENT STATION, ND US"],na.rm=TRUE))
