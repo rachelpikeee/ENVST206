@@ -31,3 +31,40 @@ abline(h=0)
 
 # Printing results of the model
 summary(dam.mod)
+
+# Make plot of beaver dams and surface water
+plot(datB$dams.n, datB$area.h, 
+     pch = 19, 
+     col = "royalblue4",
+     ylab = "Surface water area (ha)",
+     xlab =  "Number of beaver dams")
+# Add regression line
+# Make line width thicker
+abline(dam.mod, lwd=2)
+
+# Reading in leaf out data
+pheno <- read.csv("/Users/rachelpike/ENVST Data/red_maple_pheno.csv")
+
+# Set up panel of plots with one row and two columns
+dev.off()
+plot(pheno$Tmax,pheno$doy, 
+     pch = 19, 
+     col = "royalblue4",
+     ylab = "Day of leaf out",
+     xlab =  "Maximum temperature (C)")
+plot(pheno$elev,pheno$doy, 
+     pch = 19, 
+     col = "royalblue4",
+     ylab = "Day of leaf out",
+     xlab =  "Elevation (m)")
+plot(pheno$Lat,pheno$doy, 
+     pch = 19, 
+     col = "royalblue4",
+     ylab = "Day of leaf out",
+     xlab =  "Latitude (˚)")
+# Unsure how to create this plot?
+boxplot(pheno$siteDesc,pheno$doy, 
+     pch = 19, 
+     col = "royalblue4",
+     ylab = "Day of leaf out",
+     xlab =  "Latitude (˚)")
