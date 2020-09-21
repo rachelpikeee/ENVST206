@@ -63,8 +63,35 @@ plot(pheno$Lat,pheno$doy,
      ylab = "Day of leaf out",
      xlab =  "Latitude (˚)")
 # Unsure how to create this plot?
-boxplot(pheno$siteDesc,pheno$doy, 
-     pch = 19, 
-     col = "royalblue4",
-     ylab = "Day of leaf out",
-     xlab =  "Latitude (˚)")
+plot(pheno$doy ~ as.factor(pheno$siteDesc),
+     xlab = "Site Description",
+     ylab = "Day of leaf out")
+
+# Setting up a matrix of plots to check for covariance
+plot( ~  pheno$Lat + pheno$Tmax+ pheno$Tmin +pheno$Prcp + pheno$elev + pheno$siteDesc)
+
+# Representing the site descriptions as either zeros or ones
+pheno$urID <- ifelse(pheno$siteDesc == "Urban",1,0)
+
+# Building our model
+mlr <- lm(pheno$doy ~  pheno$Tmax  + pheno$Prcp + pheno$elev + pheno$urID)
+
+# Calculating residuals
+leaf.res <- rstandard(mlr)
+
+# Calculating fitted lines
+mlFitted <- fitted(mlr)
+
+# Checking to see if residuals are normally distributed
+qqnorm(leaf.res)
+qqline(leaf.res)
+
+# Checking for equal variances by making a plot of residuals
+plot(mlFitted, leaf.res,
+     pch = 19,
+     xlab = "fitted values",
+     ylab = "standardized residual")
+abline(h=0)
+
+# Getting a summary of the model outputs
+summary(mlr)
