@@ -62,7 +62,6 @@ plot(pheno$Lat,pheno$doy,
      col = "royalblue4",
      ylab = "Day of leaf out",
      xlab =  "Latitude (˚)")
-# Unsure how to create this plot?
 plot(pheno$doy ~ as.factor(pheno$siteDesc),
      xlab = "Site Description",
      ylab = "Day of leaf out")
