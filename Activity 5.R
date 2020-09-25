@@ -33,7 +33,87 @@ pr$ncount <- aggregate(datP$PRCP, by=list(datP$NAME,datP$year), FUN="length")$x
 # No convention, just what we think is appropriate for the data
 pr <- pr[pr$ncount >= 364,]
 
-# add normal r plots here to keep the same order of activity
+# Looking at only livermore california and morrisville new york preciptiation
+ca <- pr[pr$NAME == nameS[2], ]
+ny <- pr[pr$NAME == nameS[5], ]
+
+# Making a plot comparing New York and California precip
+plot(ca$YEAR, ca$totalP,
+     type = "b",
+     pch = 19,
+     ylab = "Annual precipitation (mm)",
+     xlab = "Year", 
+     yaxt = "n",
+     ylim =c(0, 1600))
+#add y axis
+axis(2, seq(0,1600, by=400), las=2 )
+#add arizona
+points(ny$YEAR, ny$totalP,
+       type = "b",
+       pch = 19,
+       col="tomato3")
+#add legend
+
+legend("topleft", #position
+       c("California", "New York"), #labels
+       col= c("black", "tomato3"), #colors
+       pch=19, #point shape
+       lwd=1, #line thickness 1, anytime both point & line arguments are given both will be drawn
+       bty="n") #always use this argument otherwise an ugly box is drawn
+
+# Adding a mean annual temp to datW
+datW$MAT <- (datW$TMAX + datW$TMIN)/2
+
+# Make a dataframe with just mean annual temp, year, and site name
+# Remove NA using na.omit
+datT <- na.omit(data.frame(NAME=datW$NAME,
+                           year=datW$year,
+                           MAT=datW$MAT))
+
+# Getting average annual mean temperatures (mm)
+mat <- aggregate(datT$MAT, by=list(datT$NAME,datT$year), FUN="mean", na.rm=TRUE)
+
+# Changing column sames
+colnames(mat) <- c("NAME", "YEAR", "MAT")
+
+# Add the x column from aggregate looking at the length of observations in each year
+# This is to see how many observations we have per year
+mat$ncount <- aggregate(datT$MAT, by=list(datT$NAME,datT$year), FUN="length")$x
+
+# Subsetting data by how many observations we think is acceptable
+# No convention, just what we think is appropriate for the data
+mat <- mat[mat$ncount >= 364,]
+
+# Looking at only livermore california and morrisville new york preciptiation
+ND <- mat[mat$NAME == nameS[3], ]
+NY <- mat[mat$NAME == nameS[5], ]
+
+# Making a plot comparing New York and North Dakota mat
+plot(ND$YEAR, ND$MAT,
+     type = "b",
+     pch = 19,
+     col = "deepskyblue2",
+     ylab = "Mean Annual Temperature (˚C)",
+     xlab = "Year") 
+     #yaxt = "n",)
+     #ylim =c(0, 1600))
+#add y axis
+#axis(2, seq(0,1600, by=400), las=2 )
+#add arizona
+points(NY$YEAR, NY$MAT,
+       type = "b",
+       pch = 19,
+       col="goldenrod2")
+#add legend
+
+legend("topleft", #position
+       c("California", "New York"), #labels
+       col= c("black", "tomato3"), #colors
+       pch=19, #point shape
+       lwd=1, #line thickness 1, anytime both point & line arguments are given both will be drawn
+       bty="n") #always use this argument otherwise an ugly box is drawn
+
+
 
 # Installing the ggplot package (only need to do once)
 install.packages("ggplot2")
