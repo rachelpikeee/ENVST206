@@ -90,25 +90,26 @@ NY <- mat[mat$NAME == nameS[5], ]
 
 # Making a plot comparing New York and North Dakota mat
 plot(ND$YEAR, ND$MAT,
-     type = "b",
+     type = "o",
      pch = 19,
      col = "deepskyblue2",
      ylab = "Mean Annual Temperature (˚C)",
-     xlab = "Year") 
-     #yaxt = "n",)
-     #ylim =c(0, 1600))
+     xlab = "Year",
+     xlim = c(1930, 2016),
+     yaxt = "n",
+     ylim =c(2, 9))
 #add y axis
-#axis(2, seq(0,1600, by=400), las=2 )
-#add arizona
+axis(2, seq(2,9, by=1), las=2 )
+#add new york
 points(NY$YEAR, NY$MAT,
-       type = "b",
+       type = "o",
        pch = 19,
-       col="goldenrod2")
+       col="goldenrod1")
 #add legend
 
 legend("topleft", #position
-       c("California", "New York"), #labels
-       col= c("black", "tomato3"), #colors
+       c("New York", "North Dakota"), #labels
+       col= c("goldenrod1", "deepskyblue2"), #colors
        pch=19, #point shape
        lwd=1, #line thickness 1, anytime both point & line arguments are given both will be drawn
        bty="n") #always use this argument otherwise an ugly box is drawn
@@ -118,6 +119,7 @@ legend("topleft", #position
 # Installing the ggplot package (only need to do once)
 install.packages("ggplot2")
 
+# Precip plot
 ggplot(data = pr,
        aes(x = YEAR,
            y = totalP,
@@ -126,4 +128,34 @@ ggplot(data = pr,
   geom_path() +
   labs(x = "Year", y = "Total Annual Precepitation (mm)") +
   theme_classic() +
-  scale_color_manual(values = c("#7FB3D5","#34495E", "#E7B800", "#FC4E07","#26A69A"))
+  scale_color_manual(values = c("#003B92","#FFDF00", "#FF8C00", "#921800","#01A4C3"))
+
+# Making violin plots
+ggplot(data = datW, aes(x=NAME, y=TMIN))+ #look at daily tmin
+  geom_violin(fill=rgb(0.933,0.953,0.98))+ #add a violin plot with blue color
+  geom_boxplot(width=0.2,size=0.25, fill="grey90")+ #add grey boxplots and make them about 20% smaller than normal with 25% thinner lines than normal
+  theme_classic() #git rid of ugly gridlines
+
+# Looking at daily patterns in AZ site in 1974
+sub <- datW[datW$NAME == nameS[4] & datW$ year == 1974,]
+
+# Specify date format
+# %Y means a four number year 
+# - indicates that the date uses dashes to seperate
+# %m means month
+# %d means day
+sub$DATE <- as.Date(sub$DATE,"%Y-%m-%d")
+
+# Making scatter plot for 1974 AZ data
+ggplot(data=sub, aes(x=DATE, y=TMAX))+
+  geom_point()+
+  geom_path()+
+  theme_classic()+
+  labs(x="year", y="Maximimum temperature (C)")
+
+# Making bar plot for precip data
+ggplot(data=sub, aes(x=DATE, y=PRCP))+
+  geom_col(fill="royalblue3")+
+  theme_classic()+
+  labs(x="year", y="Daily precipitation (mm)")
+
