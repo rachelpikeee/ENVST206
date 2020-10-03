@@ -196,9 +196,10 @@ WA$DATE <- as.Date(WA$DATE,"%Y-%m-%d")
 # Isolating just the month data
 WA$Month <- month(WA$DATE)
 
-# Trying to get the average per month per year --> something is not working here
+# Getting an average tmin per month
 WAtmin <- aggregate(WA$TMIN, by=list(WA$year,WA$Month), FUN="mean", na.rm=TRUE)
 
+# Changing columns names
 colnames(WAtmin) <- c("YEAR", "MONTH", "TMIN")
 
 # Getting the number of data per month
@@ -207,15 +208,16 @@ WAtmin$ncount <- aggregate(WA$TMIN, by=list(WA$year,WA$Month), FUN="length")$x
 # Saying there must be at least 27 data points per month
 WAtmin <- WAtmin[WAtmin$ncount >= 27,]
 
+# Sorting the months into seasons
 WAtmin$season <- ifelse((WAtmin$MONTH <=2 | WAtmin$MONTH >=12), "winter", 
                         ifelse((WAtmin$MONTH > 5 & WAtmin$MONTH < 9), "summer", 
                                ifelse((WAtmin$MONTH > 2 & WAtmin$MONTH < 6), "spring","fall")))
 
-
+# Getting the mean for each season in a new data frame
 WAtminszn <- aggregate(WAtmin$TMIN, by=list(WAtmin$YEAR,WAtmin$season), FUN="mean", na.rm=TRUE)
 
+# Adding column names
 colnames(WAtminszn) <- c("YEAR", "SEASON", "TMIN")
-
 
 # Making plot for min temps
 
