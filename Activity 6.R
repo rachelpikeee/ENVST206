@@ -39,3 +39,25 @@ g2015@data$GLACNAME <- ifelse(g2015@data$GLACNAME == "North Swiftcurrent Glacier
                               ifelse(   g2015@data$GLACNAME ==  "Miche Wabun", 
                                         "Miche Wabun Glacier",
                                         as.character(g2015@data$GLACNAME)))
+
+# Combining area data - first work with a smaller data frame
+gdf66 <- data.frame(GLACNAME = g1966@data$GLACNAME,
+                    area66 = g1966@data$Area1966)
+
+gdf15 <- data.frame(GLACNAME = g2015@data$GLACNAME,
+                    area15 = g2015@data$Area2015)
+
+# Join all data tables by glacier name
+gAll <- full_join(gdf66,gdf15, by="GLACNAME")
+
+# Calculating the % change in area from 1966 to 2015
+gAll$gdiff <- ((gAll$area66-gAll$area15)/gAll$area66)*100
+
+# Making a scatter plot of % change vs. 1966 area
+plot(gAll$area66, gAll$gdiff,
+     pch = 19,
+     ylab = "% Change in Glacier Area",
+     xlab = "Glacier Area in 1966 (m^2)",
+     main = "Percent Change in Glacier Area from 1966 to 2015 vs. Glacier Area in 1966")
+
+
