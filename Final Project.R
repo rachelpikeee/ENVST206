@@ -1,6 +1,9 @@
+# Rachel Pike
 # Final Project Script
 # Started 10/19/2020
+# Finished 11/21/2020
 
+# Installing libraries
 library(tidyr)
 library(lubridate)
 library(dplyr)
@@ -8,8 +11,11 @@ library(ggplot2)
 library(cowplot)
 library(rstatix)
 library(moments)
+library(formattable)
 
-# Reading in the wildfire and drought datasets
+# ORGANIZING DATA AND INITIAL FIGURES ------------------------------------------
+
+# Reading in the wildfire and drought data sets
 FireData <- read.csv("/Users/rachelpike/ENVST Data/final project/CAfiredata.csv")
 DroughtData <- read.csv("/Users/rachelpike/ENVST Data/final project/droughtdata.csv")
 CountyDroughtData <- read.csv("/Users/rachelpike/ENVST Data/final project/CAdroughtdata.csv")
@@ -30,22 +36,15 @@ FireData$Year <- year(FireData$incident_date_created)
 # Getting rid of outlier data point in fire data from 1969
 FireData <- subset(FireData, FireData$Year >= 2000)
 FireData <- subset(FireData, FireData$Year < 2020)
+FireData <- subset(FireData, FireData$incident_acres_burned > 0)
 
 # Subsetting drought data to match fire data --> earliest date is 2013 for fire
-DroughtData <- subset(DroughtData, DroughtData$Year >= 2013)
-CountyDroughtData <- subset(CountyDroughtData, CountyDroughtData$Year >= 2013)
+DroughtData <- subset(DroughtData, DroughtData$Year >= 2012)
+CountyDroughtData <- subset(CountyDroughtData, CountyDroughtData$Year >= 2012)
 
 # Getting summary statistics for the Fire data area burned
 summary(FireData$incident_acres_burned)
 sd(FireData$incident_acres_burned)
-
-# # Plotting a histogram of the area burned for each fire in 2019
-# ggplot(data = Fire2019, aes(x=incident_acres_burned))+
-#   geom_histogram(binwidth = 2000, fill = "chocolate", color = "black")+
-#   labs(title = "Distribution of Area Burned in 2019",
-#        x = "Area Burned (Acres)",
-#        y = "Frequency")+
-#   theme_bw()
 
 # Creating a plot of area burned for each year (COULD BE INCLUDED)
 ggplot(data = FireData, aes(x=Year, y=incident_acres_burned))+
@@ -54,24 +53,6 @@ ggplot(data = FireData, aes(x=Year, y=incident_acres_burned))+
   labs(title = "Distribution of Fire Sizes Since 2013",
        x = "Year",
        y = "Area Burned (Acres)")
-
-# # Creating data frames for each year of fire data
-# Fire2019 <- subset(FireData, FireData$Year == 2019)
-# Fire2018 <- subset(FireData, FireData$Year == 2018)
-# Fire2017 <- subset(FireData, FireData$Year == 2017)
-# Fire2016 <- subset(FireData, FireData$Year == 2016)
-# Fire2015 <- subset(FireData, FireData$Year == 2015)
-# Fire2014 <- subset(FireData, FireData$Year == 2014)
-# Fire2013 <- subset(FireData, FireData$Year == 2013)
-# 
-# # Creating data frames for each year of drought data
-# Drought2019 <- subset(DroughtData, DroughtData$Year == 2019)
-# Drought2018 <- subset(DroughtData, DroughtData$Year == 2018)
-# Drought2017 <- subset(DroughtData, DroughtData$Year == 2017)
-# Drought2016 <- subset(DroughtData, DroughtData$Year == 2016)
-# Drought2015 <- subset(DroughtData, DroughtData$Year == 2015)
-# Drought2014 <- subset(DroughtData, DroughtData$Year == 2014)
-# Drought2013 <- subset(DroughtData, DroughtData$Year == 2013)
 
 # Create data all data frame that will store year, mean area burned, min/max area burned, 
 # average drought conditions, min/max drought conditions
@@ -91,6 +72,7 @@ for (i in 1:7){
   DataAll[i,8] <- mean(current_year_drought_data$D4)
 }
 
+# Making DataAll a data frame with appropriate columns
 DataAll <- as.data.frame(DataAll)
 colnames(DataAll) = c("Year", "Mean_Acres_Burned", "Max_Acres_Burned", "Mean_D0", "Mean_D1", "Mean_D2", "Mean_D3", "Mean_D4")
 
@@ -167,7 +149,7 @@ shapiro.test(Fresno$acres_burned_trans)
 countydata <- rbind(Shasta, LA)
 countydata <- rbind(countydata, Fresno)
 
-# Checking for equal variance --> NOT equal, can't use ANOVA or Kruskal–Wallis test
+# Checking for equal variance --> NOT equal, can't use ANOVA
 bartlett.test(countydata$acres_burned_trans ~ countydata$incident_county)
 
 # Trying Anova Test
@@ -183,56 +165,52 @@ tukeyT
 kruskal.test(incident_acres_burned ~ incident_county, data = countydata)
 
 # Using the Wilcox test for post hoc
-LAFresno <- subset(countydata, countydata$incident_county != "Shasta")
-wilcox.test(incident_acres_burned ~ incident_county, data = LAFresno)
+pairwise.wilcox.test(countydata$incident_acres_burned, countydata$incident_county)
 
-ShastaFresno <- subset(countydata, countydata$incident_county != "Los Angeles")
-wilcox.test(incident_acres_burned ~ incident_county, data = ShastaFresno)
-
-LAShasta <- subset(countydata, countydata$incident_county != "Fresno")
-wilcox.test(incident_acres_burned ~ incident_county, data = LAShasta)
+# pair with box or violin plot
+ggplot(data = countydata, aes(x = incident_county, y = incident_acres_burned))+
+  geom_violin(scale = "area", color = "black", fill = "goldenrod2")+
+  theme_classic()
 
 # LARGE FIRE ANALYSIS ----------------------------------------------------------
+
 # Finding top 3 fires
-
-# Names
-# "Balch Fire"
-FireData$incident_name[1099]
-# "Riverdale Fire"
-FireData$incident_name[884]
-# "Rim Fire"
-FireData$incident_name[122]
-
-# Dates
-#2018/07/27 - 2019/01/04
-FireData$incident_dateonly_created[1099]
-FireData$incident_date_last_update[1099]
-#2017/12/04 - 2018/01/09
-FireData$incident_dateonly_created[884]
-FireData$incident_date_last_update[884]
-#2013/08/17 - 2013/09/06
-FireData$incident_dateonly_created[122]
-FireData$incident_date_last_update[122]
-
-# Counties
-# "Tulare"
-FireData$incident_county[1099]
-# "Riverside"
-FireData$incident_county[884]
-# "Tuolumne"
-FireData$incident_county[122]
-
 # Creating data frames for each county drought data
-TulareDrought <- subset(CountyDroughtData, CountyDroughtData$County == "Tulare County")
-RiversideDrought <- subset(CountyDroughtData, CountyDroughtData$County == "Riverside County")
-TuolumneDrought <- subset(CountyDroughtData, CountyDroughtData$County == "Tuolumne County")
+RanchDrought <- subset(CountyDroughtData, CountyDroughtData$County == c("Colusa County", "Glenn County", "Lake County", "Mendocino County"))
+ThomasDrought <- subset(CountyDroughtData, CountyDroughtData$County == c("Santa Barbara County", "Ventura County"))
+RimDrought <- subset(CountyDroughtData, CountyDroughtData$County == "Tuolumne County")
 
-# Isolating years before and after the major fire
-TulareDrought <- subset(TulareDrought, TulareDrought$Year == c(2017,2018,2019))
-RiversideDrought <- subset(RiversideDrought, RiversideDrought$Year == c(2016,2017,2018))
-TuolumneDrought <- subset(TuolumneDrought, TuolumneDrought$Year == c(2012,2013,2014))
+# Isolating years before and after each major fire
+RanchDrought <- subset(RanchDrought, RanchDrought$Year == c(2017,2018,2019))
+ThomasDrought <- subset(ThomasDrought, ThomasDrought$Year == c(2016,2017,2018))
+RimDrought <- subset(RimDrought, RimDrought$Year == c(2012,2013,2014))
 
-# Interesting to note that none of the counties had drought before the large fires
-# What is the best way to visualize this?
+RanchD3Before <- mean(RanchDrought$D3[RanchDrought$Year == 2017])
+RanchD3During <- mean(RanchDrought$D3[RanchDrought$Year == 2018])
+RanchD3After <- mean(RanchDrought$D3[RanchDrought$Year == 2019])
+
+ThomasD3Before <- mean(ThomasDrought$D3[ThomasDrought$Year == 2016])
+ThomasD3During <- mean(ThomasDrought$D3[ThomasDrought$Year == 2017])
+ThomasD3After <- mean(ThomasDrought$D3[ThomasDrought$Year == 2018])
+
+RimD3Before <- mean(RimDrought$D3[RimDrought$Year == 2012])
+RimD3During <- mean(RimDrought$D3[RimDrought$Year == 2013])
+RimD3After <- mean(RimDrought$D3[RimDrought$Year == 2014])
+
+# Creating vectors to become columns for a data frame
+County <- c("Ranch (Colusa, Glenn, Lake, and Mendocino Counties)","Ranch (Colusa, Glenn, Lake, and Mendocino Counties)","Ranch (Colusa, Glenn, Lake, and Mendocino Counties)", "Thomas (Santa Barbara and Ventura Counties)","Thomas (Santa Barbara and Ventura Counties)","Thomas (Santa Barbara and Ventura Counties)", "Rim (Tuolumne County)","Rim (Tuolumne County)","Rim (Tuolumne County)")
+Time <- c("Before Fire", "During Fire", "Post Fire", "Before Fire", "During Fire", "Post Fire", "Before Fire", "During Fire", "Post Fire")
+Values <- c(RanchD3Before, RanchD3During, RanchD3After, ThomasD3Before, ThomasD3During, ThomasD3After, RimD3Before, RimD3During, RimD3After)
+
+# Combining columns into one table
+TopFireDrought <- tibble(County, Time, Values)
+colnames(TopFireDrought) <- c("County", "Time", "% D3")
+
+# Plotting the conditions before, during, and after each fire
+ggplot(data = TopFireDrought, aes(x = Time, y = Values, fill = County))+
+  geom_col(position = "dodge")+
+  labs(title = "% of County in D3 Drought Before, During and After Major Fire", x = "Time",
+       y = "% of County", fill = "Fire Name")+
+  theme_classic()
 
 
